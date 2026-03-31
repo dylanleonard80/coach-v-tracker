@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   todayStr, addDays, formatDateLong,
   getWeekNumber, getPhase, getDayType, isTrainingDay,
   PHASES, START_DATE,
 } from '@/lib/program';
-import { AppState, ActiveTab, DayData } from '@/lib/types';
+import { AppState, ActiveTab, DayData, WeeklyCheckin as WCI } from '@/lib/types';
+import { loadRemoteState, upsertDayLog, upsertCheckin } from '@/lib/supabase';
 import DailyView from './DailyView';
 import WeeklyCheckin from './WeeklyCheckin';
 import Dashboard from './Dashboard';
 
 const STORAGE_KEY = 'coachv_state';
+const SYNC_DEBOUNCE_MS = 1500;
 
 function emptyDay(dateStr: string): DayData {
   return {
@@ -27,7 +29,7 @@ function emptyDay(dateStr: string): DayData {
   };
 }
 
-function loadState(): AppState {
+function loadLocalState(): AppState {
   if (typeof window === 'undefined') return { days: {}, weeklyCheckins: {} };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -36,10 +38,18 @@ function loadState(): AppState {
   return { days: {}, weeklyCheckins: {} };
 }
 
-function saveState(state: AppState) {
+function saveLocalState(state: AppState) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {}
+}
+
+// Merge remote into local — remote wins on a per-day basis for simplicity
+function mergeStates(local: AppState, remote: Partial<AppState>): AppState {
+  return {
+    days: { ...local.days, ...(remote.days ?? {}) },
+    weeklyCheckins: { ...local.weeklyCheckins, ...(remote.weeklyCheckins ?? {}) },
+  };
 }
 
 export default function CoachVApp() {
@@ -48,21 +58,40 @@ export default function CoachVApp() {
   const [appState, setAppState] = useState<AppState>({ days: {}, weeklyCheckins: {} });
   const [loaded, setLoaded] = useState(false);
   const [saveFlash, setSaveFlash] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'error'>('idle');
 
-  // Load from localStorage on mount
+  // Debounce timers: date → timer id
+  const dayTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const checkinTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+
+  // Boot: load localStorage first, then merge remote
   useEffect(() => {
-    const s = loadState();
-    setAppState(s);
+    const local = loadLocalState();
+    setAppState(local);
     setLoaded(true);
+
     // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
+
+    // Fetch remote and merge in
+    setSyncStatus('syncing');
+    loadRemoteState()
+      .then(remote => {
+        setAppState(prev => {
+          const merged = mergeStates(prev, remote);
+          saveLocalState(merged);
+          return merged;
+        });
+        setSyncStatus('idle');
+      })
+      .catch(() => setSyncStatus('error'));
   }, []);
 
-  // Persist on every state change
+  // Persist locally on every state change after initial load
   useEffect(() => {
-    if (loaded) saveState(appState);
+    if (loaded) saveLocalState(appState);
   }, [appState, loaded]);
 
   const getDay = useCallback((dateStr: string): DayData => {
@@ -72,7 +101,23 @@ export default function CoachVApp() {
   const updateDay = useCallback((dateStr: string, updater: (d: DayData) => DayData) => {
     setAppState(prev => {
       const existing = prev.days[dateStr] ?? emptyDay(dateStr);
-      return { ...prev, days: { ...prev.days, [dateStr]: updater(existing) } };
+      const updated = updater(existing);
+      // Debounced Supabase sync
+      clearTimeout(dayTimers.current[dateStr]);
+      dayTimers.current[dateStr] = setTimeout(() => {
+        upsertDayLog(dateStr, updated).catch(() => {});
+      }, SYNC_DEBOUNCE_MS);
+      return { ...prev, days: { ...prev.days, [dateStr]: updated } };
+    });
+  }, []);
+
+  const updateCheckin = useCallback((weekNum: number, ci: WCI) => {
+    setAppState(prev => {
+      clearTimeout(checkinTimers.current[weekNum]);
+      checkinTimers.current[weekNum] = setTimeout(() => {
+        upsertCheckin(weekNum, ci).catch(() => {});
+      }, SYNC_DEBOUNCE_MS);
+      return { ...prev, weeklyCheckins: { ...prev.weeklyCheckins, [weekNum]: ci } };
     });
   }, []);
 
@@ -81,7 +126,13 @@ export default function CoachVApp() {
   const phaseData = PHASES[phase - 1];
 
   function handleSaveForCoach() {
-    const data = JSON.stringify({ ...appState, exportedAt: new Date().toISOString(), client: 'Dylan', week, phase }, null, 2);
+    const data = JSON.stringify({
+      ...appState,
+      exportedAt: new Date().toISOString(),
+      client: 'Dylan',
+      week,
+      phase,
+    }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -133,7 +184,13 @@ export default function CoachVApp() {
           <h1>COACH V</h1>
           <div className="subtitle">12-WEEK RECOMPOSITION</div>
         </div>
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {syncStatus === 'syncing' && (
+            <span style={{ fontSize: 9, color: 'var(--text-muted)', letterSpacing: 1 }}>SYNCING</span>
+          )}
+          {syncStatus === 'error' && (
+            <span style={{ fontSize: 9, color: 'var(--red)', letterSpacing: 1 }}>OFFLINE</span>
+          )}
           <span className="badge-phase">P{phase}</span>
           <span className="badge-week">WK {week}</span>
         </div>
@@ -146,15 +203,20 @@ export default function CoachVApp() {
         <button className={`nav-btn${tab === 'dashboard' ? ' active' : ''}`} onClick={() => setTab('dashboard')}>DASHBOARD</button>
       </nav>
 
-      {/* Daily view day navigator */}
+      {/* Day navigator */}
       {tab === 'daily' && (
         <div className="day-nav">
           <button className="day-nav-btn" onClick={() => setCurrentDate(d => addDays(d, -1))}>←</button>
           <div style={{ textAlign: 'center' }}>
             <div className="day-label">{formatDateLong(currentDate)}</div>
-            <div className="day-type">{isTrainingDay(getDayType(currentDate))
-              ? getDayType(currentDate).replace('_', ' / ').toUpperCase()
-              : getDayType(currentDate) === 'sunday' ? 'SUNDAY — PREP & RECHARGE' : 'REST DAY'}</div>
+            <div className="day-type">
+              {(() => {
+                const t = getDayType(currentDate);
+                if (t === 'sunday') return 'SUNDAY — PREP & RECHARGE';
+                if (t === 'rest') return 'REST DAY — ACTIVE RECOVERY';
+                return t.replace(/_/g, ' / ').toUpperCase();
+              })()}
+            </div>
             {!isToday && (
               <button className="today-btn" onClick={() => setCurrentDate(today)}>TODAY</button>
             )}
@@ -189,7 +251,7 @@ export default function CoachVApp() {
           <WeeklyCheckin
             currentDate={currentDate}
             appState={appState}
-            setAppState={setAppState}
+            updateCheckin={updateCheckin}
           />
         )}
         {tab === 'dashboard' && (
@@ -204,7 +266,7 @@ export default function CoachVApp() {
           onClick={handleSaveForCoach}
           style={saveFlash ? { background: 'var(--green)' } : {}}
         >
-          {saveFlash ? '✓ SAVED' : 'SAVE FOR COACH V'}
+          {saveFlash ? '✓ SAVED' : 'EXPORT FOR COACH V'}
         </button>
         <button className="btn btn-outline" onClick={handleLoadData}>LOAD DATA</button>
       </div>

@@ -7,7 +7,7 @@ import { AppState, WeeklyCheckin as WCI } from '@/lib/types';
 interface Props {
   currentDate: string;
   appState: AppState;
-  setAppState: React.Dispatch<React.SetStateAction<AppState>>;
+  updateCheckin: (weekNum: number, ci: WCI) => void;
 }
 
 function emptyCheckin(): WCI {
@@ -18,20 +18,15 @@ function emptyCheckin(): WCI {
   };
 }
 
-export default function WeeklyCheckin({ currentDate, appState, setAppState }: Props) {
+export default function WeeklyCheckin({ currentDate, appState, updateCheckin }: Props) {
   const currentWeek = getWeekNumber(currentDate);
   const [selectedWeek, setSelectedWeek] = useState(currentWeek);
 
   const ci: WCI = appState.weeklyCheckins[selectedWeek] ?? emptyCheckin();
 
   function updateCI(key: keyof WCI, val: string) {
-    setAppState(prev => ({
-      ...prev,
-      weeklyCheckins: {
-        ...prev.weeklyCheckins,
-        [selectedWeek]: { ...(prev.weeklyCheckins[selectedWeek] ?? emptyCheckin()), [key]: val },
-      },
-    }));
+    const updated = { ...(appState.weeklyCheckins[selectedWeek] ?? emptyCheckin()), [key]: val };
+    updateCheckin(selectedWeek, updated);
   }
 
   // Auto-calc stats for selected week
