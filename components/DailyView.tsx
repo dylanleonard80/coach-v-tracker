@@ -48,6 +48,8 @@ export default function DailyView({ dateStr, dayData, updateDay, phase }: Props)
     ? (TRAINING_BY_PHASE[phase]?.[type] ?? TRAINING_BY_PHASE[1][type] ?? [])
     : [];
 
+  const [expandedSchedule, setExpandedSchedule] = useState<Set<number>>(new Set());
+
   function set<K extends keyof DayData>(key: K, val: DayData[K]) {
     updateDay(dateStr, d => ({ ...d, [key]: val }));
   }
@@ -94,6 +96,7 @@ export default function DailyView({ dateStr, dayData, updateDay, phase }: Props)
       <Section title="Daily Schedule" completion={`${schedChecked}/${schedule.length}`} defaultCollapsed={schedChecked === schedule.length}>
         {schedule.map((item, i) => {
           const checked = dayData.schedule['s' + i] ?? false;
+          const expanded = expandedSchedule.has(i);
           return (
             <div key={i} className={`check-item${checked ? ' checked' : ''}`}>
               <input
@@ -103,11 +106,33 @@ export default function DailyView({ dateStr, dayData, updateDay, phase }: Props)
                 onChange={e => set('schedule', { ...dayData.schedule, ['s' + i]: e.target.checked })}
               />
               <div style={{ flex: 1 }}>
-                <div className="item-time" style={{ color: CAT_COLORS[item.cat] ?? 'var(--text-muted)' }}>
-                  {item.time} — {item.cat}
+                <div
+                  style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', cursor: 'pointer', userSelect: 'none' }}
+                  onClick={() => setExpandedSchedule(prev => {
+                    const next = new Set(prev);
+                    next.has(i) ? next.delete(i) : next.add(i);
+                    return next;
+                  })}
+                >
+                  <div style={{ flex: 1 }}>
+                    <div className="item-time" style={{ color: CAT_COLORS[item.cat] ?? 'var(--text-muted)' }}>
+                      {item.time} — {item.cat}
+                    </div>
+                    <div className="item-name">{item.action}</div>
+                    {!expanded && <div className="item-detail">{item.detail}</div>}
+                  </div>
+                  <span style={{ color: 'var(--text-muted)', fontSize: 13, paddingLeft: 8, paddingTop: 2, flexShrink: 0 }}>
+                    {expanded ? '▾' : '▸'}
+                  </span>
                 </div>
-                <div className="item-name">{item.action}</div>
-                <div className="item-detail">{item.detail}</div>
+                {expanded && (
+                  <div style={{ marginTop: 6, paddingTop: 6, borderTop: '1px solid var(--border)' }}>
+                    <div className="item-detail" style={{ marginBottom: item.notes ? 6 : 0 }}>{item.detail}</div>
+                    {item.notes && (
+                      <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.55 }}>{item.notes}</div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           );
