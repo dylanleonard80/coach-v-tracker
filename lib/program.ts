@@ -215,7 +215,7 @@ export const TRAINING_BY_PHASE: Record<number, Record<string, Exercise[]>> = {
 // ============================================================
 export const SCHEDULE_TRAINING: ScheduleItem[] = [
   { time: '7:00 AM', cat: 'WAKE', action: 'Alarm. Get up.', detail: 'Weigh yourself. Log it.' },
-  { time: '7:05 AM', cat: 'INJECTION', action: 'AM Peptides', detail: 'CJC-1295 100mcg + Ipa 100mcg + BPC-157 250mcg + MOTS-C 10mg (M/W/F)' },
+  { time: '7:05 AM', cat: 'INJECTION', action: 'AM Peptides', detail: 'CJC-1295 100mcg + Ipa 100mcg + BPC-157 250mcg + MOTS-C ~1.7mg (M/W/F)' },
   { time: '7:10 AM', cat: 'SUPPLEMENTS', action: 'AM Supps', detail: 'Probiotic, LMNT #1, Vitamin D3+K2' },
   { time: '7:15 AM', cat: 'CARDIO', action: 'Fasted LISS', detail: '25-40 min incline walk. Zone 2.' },
   { time: '8:00 AM', cat: 'MEAL', action: 'Meal 1 — Pre-Workout', detail: 'Eggs + rice. 40P/55C/15F.' },
@@ -342,7 +342,7 @@ export function getPeptideList(dateStr: string): Array<{ key: string; label: str
   }
   list.push({ key: 'am_bpc', label: 'AM — BPC-157 (250mcg)' });
   if ([1, 3, 5].includes(dow)) {
-    list.push({ key: 'am_motsc', label: 'AM — MOTS-C (10mg)' });
+    list.push({ key: 'am_motsc', label: 'AM — MOTS-C (~1.7mg | 5mg/wk total)' });
   }
   list.push({ key: 'pm_tesa', label: 'PM — Tesamorelin (2mg)' });
   if (dow !== 0 && dow !== 6) {
