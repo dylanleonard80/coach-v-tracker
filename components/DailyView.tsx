@@ -127,9 +127,13 @@ export default function DailyView({ dateStr, dayData, updateDay, phase }: Props)
                 </div>
                 {expanded && (
                   <div style={{ marginTop: 6, paddingTop: 6, borderTop: '1px solid var(--border)' }}>
-                    <div className="item-detail" style={{ marginBottom: item.notes ? 6 : 0 }}>{item.detail}</div>
-                    {item.notes && (
-                      <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.55 }}>{item.notes}</div>
+                    <div className="item-detail" style={{ marginBottom: item.notes?.length ? 6 : 0 }}>{item.detail}</div>
+                    {item.notes && item.notes.length > 0 && (
+                      <ul style={{ margin: 0, padding: '0 0 0 18px' }}>
+                        {item.notes.map((n, ni) => (
+                          <li key={ni} style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 3 }}>{n}</li>
+                        ))}
+                      </ul>
                     )}
                   </div>
                 )}

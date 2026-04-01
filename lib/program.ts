@@ -23,7 +23,7 @@ export interface ScheduleItem {
   cat: string;
   action: string;
   detail: string;
-  notes?: string;
+  notes?: string[];
 }
 
 export interface Phase {
@@ -217,189 +217,412 @@ export const TRAINING_BY_PHASE: Record<number, Record<string, Exercise[]>> = {
 export const SCHEDULE_TRAINING: ScheduleItem[] = [
   {
     time: '7:00 AM', cat: 'WAKE', action: 'Alarm. Get up.', detail: 'Weigh yourself. Log it.',
-    notes: 'Weigh on empty bladder before eating or drinking. Same time and conditions daily. Single readings mean nothing — your 7-day average is the signal. Log it in the app every day.',
+    notes: [
+      'Weigh on empty bladder — before food, water, or coffee.',
+      'Same time, same conditions every day for accurate comparison.',
+      'Single readings mean nothing. Your 7-day average is the signal.',
+      'Log it in the app immediately so you don\'t forget.',
+    ],
   },
   {
-    time: '7:05 AM', cat: 'INJECTION', action: 'AM Peptides', detail: 'CJC-1295 100mcg + Ipa 100mcg + BPC-157 250mcg + MOTS-C ~1.7mg (M/W/F)',
-    notes: 'Subcutaneous injection. Rotate sites daily (belly, thigh, glute) to prevent lipodystrophy. Must be fasted — insulin blunts the GH pulse. CJC + Ipamorelin synergize for a stronger, more natural GH release. MOTS-C is Mon/Wed/Fri only (~1.7mg per dose, 5mg/wk total). BPC-157 every morning for gut and connective tissue repair.',
+    time: '7:05 AM', cat: 'INJECTION', action: 'AM Peptides', detail: 'CJC-1295 100mcg + Ipa 100mcg + BPC-157/TB-500 Blend + MOTS-C ~1.7mg (M/W/F)',
+    notes: [
+      'Subcutaneous injection. Rotate sites daily (belly, thigh, glute) to prevent lipodystrophy.',
+      'Must be fully fasted — insulin blunts GH release completely.',
+      'CJC-1295 100mcg + Ipamorelin 100mcg — synergize for a stronger, more natural GH pulse.',
+      'BPC-157/TB-500 Blend — every morning. Covers gut repair, connective tissue healing, and systemic recovery.',
+      'MOTS-C ~1.7mg — Mon/Wed/Fri only (5mg/week total). Mitochondrial biogenesis and metabolic optimization.',
+      'Can all go in one syringe if volumes allow.',
+    ],
   },
   {
     time: '7:10 AM', cat: 'SUPPLEMENTS', action: 'AM Supps', detail: 'Probiotic, LMNT #1, Vitamin D3+K2',
-    notes: 'Probiotic on empty stomach for best colonization. LMNT replaces sodium, potassium, and magnesium lost overnight — especially important on recomp. D3+K2 together: K2 directs calcium to bone and away from arteries. Take all three before cardio.',
+    notes: [
+      'Probiotic 50B+ CFU — take on empty stomach before any food for best colonization.',
+      'LMNT — 1 packet in water. Replaces sodium, potassium, and magnesium lost overnight.',
+      'Vitamin D3 5000 IU + K2 200mcg — always together. K2 directs calcium to bone, keeps it out of arteries.',
+      'Take all three before cardio.',
+    ],
   },
   {
     time: '7:15 AM', cat: 'CARDIO', action: 'Fasted LISS', detail: '25-40 min incline walk. Zone 2.',
-    notes: 'Incline treadmill (10-15% grade) or outdoor walk. Target HR: 125-145 bpm (Zone 2 for you at 6\'5"). Fasted state forces fat oxidation — this is the whole point. No food, only water and LMNT. Start at 25 min weeks 1-4, build to 40 min by week 8.',
+    notes: [
+      'Incline treadmill 10-15% grade, or outdoor walk with hills.',
+      'Target HR: 125-145 bpm — Zone 2 for your size.',
+      'Fasted state forces fat oxidation. This is the entire point.',
+      'Water and LMNT only. No food, no pre-workout.',
+      'Weeks 1-4: 25-30 min. Weeks 5-8: 30-35 min. Weeks 9-12: 35-40 min.',
+    ],
   },
   {
     time: '8:00 AM', cat: 'MEAL', action: 'Meal 1 — Pre-Workout', detail: 'Eggs + rice. 40P/55C/15F.',
-    notes: 'Whole eggs (3-4) + egg whites if needed + cooked white rice (150g). Eat within 45 min of finishing LISS. Goal: refuel glycogen before training without overeating. White rice digests faster than brown here — that\'s the point.',
+    notes: [
+      'Whole eggs 3-4 (or add whites to hit protein) + white rice 150g cooked.',
+      'Eat within 45 min of finishing LISS — glycogen window is open.',
+      'White rice over brown here — faster digestion, quicker glycogen refuel before training.',
+      'Goal: 40g protein / 55g carbs / 15g fat.',
+      'Optional: add hot sauce, soy sauce, or salsa for flavor.',
+    ],
   },
   {
     time: '8:30 AM', cat: 'SUPPLEMENTS', action: 'Pre-Workout', detail: 'Caffeine 200-300mg + Citrulline 6-8g. 30 min before training.',
-    notes: 'Caffeine 200-300mg (2 coffees or 1 pill + 1 coffee). Citrulline malate 6-8g for blood flow and pump — take it 30 min out. If you train later in the day, cut caffeine off by 2pm or you\'ll destroy your sleep. No pre-workout stims with stimulants beyond caffeine.',
+    notes: [
+      'Caffeine 200-300mg — 2 cups coffee, or 1 pill + 1 cup.',
+      'Citrulline malate 6-8g — improves blood flow, pump, and endurance. Take 30 min before lifting.',
+      'No additional stimulants or pre-workout blends with synephrine, yohimbine, etc.',
+      'If training after 4pm, cap caffeine at 200mg. After 5pm, skip it entirely — it will tank your sleep.',
+    ],
   },
   {
     time: '9:00 AM', cat: 'TRAINING', action: 'Training Session', detail: 'Follow the program. Log every set.',
-    notes: 'Log every set: weight, reps, and whether you hit the target RPE. Progressive overload is the entire game. If you miss reps, note it — do not increase weight next session. If you crush it at RPE 7, increase next time. The log is your feedback loop.',
+    notes: [
+      'Log every set: weight used, reps completed, and subjective RPE.',
+      'Progressive overload is the entire mechanism. If you don\'t track, you can\'t progress.',
+      'Missed reps = do not increase weight next session.',
+      'Crushed it at RPE 7 or below = increase weight next session.',
+      'Rest times are prescribed — respect them. Early fatigue means the rest was too short.',
+    ],
   },
   {
     time: '10:30 AM', cat: 'SUPPLEMENTS', action: 'Post-Workout Supps', detail: 'Creatine 5g + EAAs during workout.',
-    notes: 'Creatine monohydrate 5g — timing flexible but post-workout is fine. No loading phase needed at 5g/day consistent. EAAs or BCAAs during the session if training is over 60 min to prevent catabolism. Mix in water, not juice.',
+    notes: [
+      'Creatine monohydrate 5g — mix in water or add to your shake. Timing is flexible, post-workout is fine.',
+      'No loading phase needed. 5g/day consistent is all you need.',
+      'EAAs 10-15g — sip during the session if training exceeds 60 min to blunt catabolism.',
+      'Skip the fancy flavored creatine — plain monohydrate is clinically identical.',
+    ],
   },
   {
     time: '11:00 AM', cat: 'MEAL', action: 'Meal 2 — Post-Workout Shake', detail: 'Whey isolate 2 scoops + banana. 50P/35C/5F.',
-    notes: 'Whey isolate (not concentrate) — faster absorption, lower fat, less GI stress. 2 scoops in water + 1 medium banana. Get this in within 30-60 min post-training. This is your most anabolic window of the day. Don\'t skip it or replace it with real food — the speed matters here.',
+    notes: [
+      'Whey isolate (not concentrate) — faster absorption, less fat, less GI stress.',
+      '2 scoops in water + 1 medium banana. Blend or shake.',
+      'Get this in within 30-60 min post-training — the speed of this meal matters.',
+      'This is your most anabolic window. Don\'t replace it with real food.',
+      'Goal: 50g protein / 35g carbs / 5g fat.',
+    ],
   },
   {
     time: '1:30 PM', cat: 'MEAL', action: 'Meal 3 — Lunch', detail: 'Chicken + rice + veggies. 50P/50C/15F.',
-    notes: 'Chicken breast or thigh (200-220g cooked) + white rice (150g cooked) + broccoli, zucchini, or green beans. Largest carb meal of the day — muscles are still glycogen-hungry from training. Don\'t skimp on carbs at this meal.',
+    notes: [
+      'Chicken breast or thigh 200-220g cooked (batch prepped from Sunday).',
+      'White rice 150g cooked.',
+      'Veggies: broccoli, zucchini, green beans, or mixed greens.',
+      'Largest carb meal of the day — muscles are still absorbing glycogen from training.',
+      'Goal: 50g protein / 50g carbs / 15g fat.',
+    ],
   },
   {
     time: '2:00 PM', cat: 'RECOVERY', action: 'Post-Lunch Walk', detail: '10 min. Non-negotiable.',
-    notes: 'Even 10 min of walking after eating blunts the blood sugar spike, aids digestion, and meaningfully improves insulin sensitivity over time. Don\'t sit down right after eating. This has real peer-reviewed data behind it — easy win.',
+    notes: [
+      '10-15 min walk immediately after eating.',
+      'Blunts blood sugar spike from the carb-heavy lunch.',
+      'Improves insulin sensitivity over time — peer-reviewed data backs this.',
+      'Easy pace. This is not a workout, it\'s digestion support.',
+    ],
   },
   {
     time: '5:00 PM', cat: 'MEAL', action: 'Meal 4 — Afternoon', detail: 'Ground turkey or fish + carbs + veggies. 50P/45C/15F.',
-    notes: 'Ground turkey (93/7), salmon, tilapia, or shrimp. Start pulling carbs down compared to Meal 3 — insulin sensitivity decreases in the evening. Veggies for volume and fiber. No liquid carbs (juice, sports drinks). This meal transitions you toward an evening fat-burning state.',
+    notes: [
+      'Protein: ground turkey 93/7, salmon, tilapia, shrimp, or white fish.',
+      'Carbs: rice (smaller portion than lunch), sweet potato, or fruit.',
+      'Veggies: whatever you have — volume and fiber.',
+      'Start pulling carbs down vs. Meal 3. Insulin sensitivity decreases in the evening.',
+      'No liquid carbs — juice, sports drinks, sweetened anything.',
+      'Goal: 50g protein / 45g carbs / 15g fat.',
+    ],
   },
   {
     time: '9:00 PM', cat: 'MEAL', action: 'Meal 5 — Pre-Bed', detail: 'Casein or cottage cheese + PB. 40P/15C/20F.',
-    notes: 'Casein protein (1 scoop) or 1 cup cottage cheese + 1 tbsp natural peanut butter. Casein is slow-digesting — feeds muscles for 6-8 hrs overnight. Low glycemic, no blood sugar spike before sleep. This meal directly supports overnight recovery and the GH pulse triggered by your PM peptides.',
+    notes: [
+      'Option A: 1 scoop casein protein in water.',
+      'Option B: 1 cup cottage cheese + 1 tbsp natural peanut butter.',
+      'Casein digests over 6-8 hours — feeds muscles through the night.',
+      'Low glycemic. No blood sugar spike before sleep.',
+      'Directly supports the GH pulse triggered by your PM peptides.',
+      'Goal: 40g protein / 15g carbs / 20g fat.',
+    ],
   },
   {
     time: '9:30 PM', cat: 'SUPPLEMENTS', action: 'PM Supps', detail: 'Magnesium 400mg, L-Theanine 200mg, Psyllium husk 1 tbsp.',
-    notes: 'Magnesium glycinate 400mg — improves sleep architecture (more deep sleep), reduces muscle cramping, supports testosterone production. L-Theanine 200mg — calms the nervous system without drowsiness. Psyllium husk 1 tbsp in water — gut health, regularity, and improves insulin sensitivity the next day.',
+    notes: [
+      'Magnesium Glycinate 400mg — improves deep sleep, reduces muscle cramping, supports testosterone.',
+      'L-Theanine 200mg — calms the nervous system without sedation. Pairs well with the magnesium.',
+      'Psyllium Husk 1 tbsp in water — gut health, regularity, and improves next-day insulin sensitivity.',
+      'Take 20-30 min before your PM injection window.',
+    ],
   },
   {
-    time: '10:00 PM', cat: 'INJECTION', action: 'PM Peptides', detail: 'Tesamorelin 2mg + CJC/Ipa 100/100mcg + BPC-157 250mcg (2hr fasted).',
-    notes: 'Must be 2+ hours fasted — insulin blocks GH release completely. Inject Tesamorelin first (it\'s sensitive to agitation), wait 5-10 min, then CJC/Ipa + BPC-157. Tesa directly targets visceral fat and amplifies GH output. This PM window + sleep is when 80% of your daily GH is released. Protect it.',
+    time: '10:00 PM', cat: 'INJECTION', action: 'PM Peptides', detail: 'Tesamorelin 2mg + CJC/Ipa 100/100mcg + BPC-157/TB-500 Blend (2hr fasted).',
+    notes: [
+      'Must be 2+ hours fasted — insulin completely blocks GH release.',
+      'Inject Tesamorelin first. It\'s sensitive to agitation — reconstitute gently, no shaking.',
+      'Wait 5-10 min, then CJC/Ipa 100/100mcg + BPC-157/TB-500 Blend in one syringe.',
+      'Tesamorelin directly targets visceral fat and amplifies GH output.',
+      'This PM window + slow-wave sleep = 80% of your daily GH release. Protect it.',
+    ],
   },
   {
     time: '10:30 PM', cat: 'RECOVERY', action: 'Wind Down', detail: 'Phone away. Room 65-68°F.',
-    notes: 'Phone in another room or on grayscale/red-light filter mode. Set room temp to 65-68°F — core body temperature must drop 1-2°F to initiate deep sleep. Blackout curtains if you have them. Blue light kills melatonin production. 30 min of wind-down is the price of quality sleep.',
+    notes: [
+      'Phone in another room, or grayscale + night shift mode at minimum.',
+      'Set room to 65-68°F — core temp must drop 1-2°F to enter deep sleep.',
+      'Blue light suppresses melatonin. Screen time at 10pm directly delays sleep onset.',
+      'Blackout curtains if possible. Even ambient light disrupts sleep architecture.',
+    ],
   },
   {
     time: '10:45 PM', cat: 'SLEEP', action: 'Lights Out', detail: '7.5-8.5 hours. Non-negotiable.',
-    notes: '80% of daily GH release happens during slow-wave sleep. Muscle repair, cortisol clearance, and memory consolidation all require 7.5+ hours. Cutting sleep by even 90 min measurably reduces testosterone and increases cortisol. If results are stalling, sleep is always the first question.',
+    notes: [
+      '80% of daily GH release happens during slow-wave sleep.',
+      'Cutting sleep by 90 min measurably reduces testosterone and increases cortisol.',
+      'Muscle repair, glycogen synthesis, and memory consolidation all require 7.5+ hours.',
+      'If results are stalling and you\'re sleeping under 7 hours, sleep is the first fix.',
+    ],
   },
 ];
 
 export const SCHEDULE_REST: ScheduleItem[] = [
   {
     time: '7:00 AM', cat: 'WAKE', action: 'Alarm. Rest day.', detail: 'Weigh yourself. Log it.',
-    notes: 'Same drill — empty bladder, same time, before eating. Rest days tend to show lower weights due to less glycogen. Don\'t read into it. Track the 7-day trend.',
+    notes: [
+      'Same drill as training days — empty bladder, same time, before eating.',
+      'Rest days often show lower scale weight due to less glycogen and water retention.',
+      'Don\'t read into single readings. Track the 7-day trend.',
+    ],
   },
   {
-    time: '7:05 AM', cat: 'INJECTION', action: 'AM Peptides', detail: 'CJC-1295 100mcg + Ipa 100mcg + BPC-157 250mcg (if on-day).',
-    notes: 'CJC/Ipa every weekday (Mon-Fri). BPC-157 every day — rest days are when connective tissue repair actually happens, so don\'t skip it. MOTS-C only Mon/Wed/Fri. Fasted injection, rotate sites.',
+    time: '7:05 AM', cat: 'INJECTION', action: 'AM Peptides', detail: 'CJC-1295 100mcg + Ipa 100mcg + BPC-157/TB-500 Blend.',
+    notes: [
+      'CJC/Ipa every weekday (Mon-Fri). Skip on weekends.',
+      'BPC-157/TB-500 Blend every day — rest days are when the repair work actually happens. Don\'t skip it.',
+      'MOTS-C Mon/Wed/Fri only — check day before injecting.',
+      'Fasted injection. Rotate sites.',
+    ],
   },
   {
     time: '7:10 AM', cat: 'SUPPLEMENTS', action: 'AM Supps', detail: 'Probiotic, LMNT #1, Vitamin D3+K2.',
-    notes: 'Same as training days. Probiotic before food, LMNT with water. D3+K2 with or without food — fat-soluble so a small amount of fat at breakfast is fine.',
+    notes: [
+      'Probiotic 50B+ CFU — empty stomach before food.',
+      'LMNT 1 packet in water.',
+      'Vitamin D3 5000 IU + K2 200mcg.',
+      'Same every day. Supplements don\'t take rest days.',
+    ],
   },
   {
     time: '7:30 AM', cat: 'MEAL', action: 'Meal 1', detail: 'Eggs + avocado. Higher fat, lower carb.',
-    notes: 'On rest days carbs are reduced — you\'re not fueling training. 3-4 whole eggs + half avocado. Healthy fats keep you satiated and support hormone production. No rice or oats this morning.',
+    notes: [
+      'Whole eggs 3-4 + half avocado.',
+      'Carbs are reduced on rest days — you\'re not fueling a training session.',
+      'Higher fat this morning supports hormone production and keeps you full longer.',
+      'No rice, oats, or toast at this meal.',
+    ],
   },
   {
     time: '9:00 AM', cat: 'CARDIO', action: 'Outdoor Walk', detail: '30-40 min. Easy pace. Get sun.',
-    notes: 'Get outside. Sunlight in the AM sets your circadian rhythm for better sleep that night. Easy pace only — this is active recovery, not a workout. No incline walking or elevated HR today. Keep it conversational pace.',
+    notes: [
+      'Get outside — sunlight in the AM anchors your circadian rhythm.',
+      'Easy conversational pace only. HR should stay under 120.',
+      'This is active recovery, not a workout. No hills, no incline protocol.',
+      'Direct sunlight helps melatonin timing, which means better sleep tonight.',
+    ],
   },
   {
     time: '10:00 AM', cat: 'RECOVERY', action: 'Foam Roll + Stretch', detail: '15 min foam rolling, dynamic stretching.',
-    notes: 'Focus on whatever you trained yesterday: quads, hamstrings, thoracic spine, hip flexors. Foam roll slowly — 30-60 sec per spot. Follow with dynamic stretches (leg swings, hip circles). This directly reduces DOMS and improves next session performance.',
+    notes: [
+      'Focus on what you trained yesterday: quads, hamstrings, glutes, thoracic spine, hip flexors.',
+      'Foam roll slowly — 30-60 sec per spot. Move through tension, don\'t just sit on it.',
+      'Follow with dynamic stretches: leg swings, hip circles, shoulder circles.',
+      'This directly reduces DOMS and improves performance in tomorrow\'s session.',
+    ],
   },
   {
     time: '12:00 PM', cat: 'MEAL', action: 'Meal 2 — Lunch', detail: 'Lean protein + veggies + fats.',
-    notes: 'Chicken or fish (200g) + leafy greens or cruciferous veggies + olive oil or avocado. Lower carbs today. Your body doesn\'t need glycogen replenishment — it needs amino acids and micronutrients for repair.',
+    notes: [
+      'Protein: chicken breast or fish 200g cooked.',
+      'Veggies: leafy greens, broccoli, cucumbers, or mixed salad.',
+      'Fat: olive oil drizzle, avocado, or handful of nuts.',
+      'Lower carbs today — body doesn\'t need glycogen replenishment on a rest day.',
+    ],
   },
   {
     time: '3:00 PM', cat: 'MEAL', action: 'Meal 3 — Afternoon', detail: 'Protein + moderate carbs.',
-    notes: 'Reintroduce some carbs here if you\'re feeling low energy. Keep it moderate — sweet potato, fruit, or a small serving of rice. Protein stays the same every day regardless of training.',
+    notes: [
+      'Protein stays the same every day regardless of training status.',
+      'Reintroduce some carbs here if energy is low: sweet potato, fruit, or small rice portion.',
+      'Keep it moderate — you\'re not in a post-workout glycogen replenishment window.',
+    ],
   },
   {
     time: '5:00 PM', cat: 'RECOVERY', action: 'Sauna (if available)', detail: '15-20 min. Hydrate with LMNT.',
-    notes: '15-20 min at 170-190°F. Research shows sauna 3-4x/week increases GH output by 2-5x. Drink LMNT before and after — you lose 500-800ml of fluid per session. Cool down slowly. Do not go in fasted for long sessions.',
+    notes: [
+      '15-20 min at 170-190°F.',
+      'Sauna 3-4x/week is shown to increase GH output by 2-5x in research.',
+      'Drink LMNT before and after — you lose 500-800ml of fluid per session.',
+      'Cool down slowly. Don\'t go directly from sauna to cold plunge on a hard training week.',
+    ],
   },
   {
     time: '7:00 PM', cat: 'MEAL', action: 'Meal 4 — Dinner', detail: 'Lean protein + veggies.',
-    notes: 'Ground turkey, salmon, or shrimp. Load up on veggies — fiber, micronutrients, and gut health. Keep fat moderate. No need to chase carbs tonight.',
+    notes: [
+      'Protein: ground turkey, salmon, shrimp, or white fish.',
+      'Veggies: whatever you have — prioritize fiber and micronutrients.',
+      'Keep fat moderate. No need to chase carbs tonight.',
+    ],
   },
   {
     time: '8:30 PM', cat: 'MEAL', action: 'Meal 5 — Pre-Bed', detail: 'Casein or cottage cheese.',
-    notes: 'Casein or cottage cheese, no peanut butter tonight if you want to keep calories tighter on rest days. Slow-digesting protein overnight is just as important on rest days — this is when repair happens.',
+    notes: [
+      'Option A: 1 scoop casein in water.',
+      'Option B: 1 cup cottage cheese (skip PB if keeping calories tight on rest days).',
+      'Slow-digesting protein is just as critical on rest days — this is when repair happens.',
+    ],
   },
   {
-    time: '8:30 PM', cat: 'SUPPLEMENTS', action: 'PM Supps', detail: 'Magnesium, L-Theanine, Psyllium husk.',
-    notes: 'Magnesium glycinate 400mg, L-Theanine 200mg, Psyllium husk 1 tbsp. Same as training days — these don\'t change. Consistency is the whole point.',
+    time: '8:30 PM', cat: 'SUPPLEMENTS', action: 'PM Supps', detail: 'Magnesium 400mg, L-Theanine 200mg, Psyllium husk 1 tbsp.',
+    notes: [
+      'Magnesium Glycinate 400mg.',
+      'L-Theanine 200mg.',
+      'Psyllium Husk 1 tbsp in water.',
+      'Same every day. Consistency is the whole point.',
+    ],
   },
   {
-    time: '9:00 PM', cat: 'INJECTION', action: 'PM Peptides', detail: 'Tesamorelin 2mg + CJC/Ipa + BPC-157.',
-    notes: '2+ hours fasted. Rest days are actually prime time for the Tesamorelin + GH combo — your body has all night to use it without competing demands. Inject Tesa first, wait 5-10 min, then CJC/Ipa + BPC in one shot.',
+    time: '9:00 PM', cat: 'INJECTION', action: 'PM Peptides', detail: 'Tesamorelin 2mg + CJC/Ipa + BPC-157/TB-500 Blend.',
+    notes: [
+      '2+ hours fasted — non-negotiable.',
+      'Rest days are prime time for the Tesamorelin + GH combo. No training competing for resources.',
+      'Inject Tesamorelin first, wait 5-10 min.',
+      'Then CJC/Ipa + BPC-157/TB-500 Blend in one syringe.',
+    ],
   },
   {
     time: '9:45 PM', cat: 'SLEEP', action: 'Lights Out', detail: 'Sleep.',
-    notes: 'Earlier bedtime on rest days when possible. Recovery happens during sleep — the whole point of a rest day is to let the adaptation from yesterday\'s training actually occur. 7.5 hours minimum.',
+    notes: [
+      'Earlier bedtime on rest days if possible.',
+      'Recovery and adaptation from yesterday\'s training happens during sleep — that\'s the whole point of a rest day.',
+      '7.5 hours minimum.',
+    ],
   },
 ];
 
 export const SCHEDULE_SUNDAY: ScheduleItem[] = [
   {
     time: '7:00 AM', cat: 'WAKE', action: 'Sunday. Weigh in.', detail: 'Weigh yourself. Log 7-day average.',
-    notes: 'Sunday weigh-in is the anchor. Log your weight and calculate your 7-day average — that number is what we track weekly, not the single reading. Expect variability day to day; the trend line is the truth.',
+    notes: [
+      'Sunday weigh-in is the weekly anchor.',
+      'Log today\'s weight and calculate the 7-day average — that\'s what we track, not single readings.',
+      'Expect day-to-day variability. The trend line over weeks is the truth.',
+    ],
   },
   {
-    time: '7:05 AM', cat: 'INJECTION', action: 'AM Peptides', detail: 'CJC/Ipa + BPC-157 (if on-day).',
-    notes: 'No MOTS-C on Sunday (MWF only). CJC/Ipa is weekdays only — skip it Sunday. BPC-157 continues daily. Rotate injection sites.',
+    time: '7:05 AM', cat: 'INJECTION', action: 'AM Peptides', detail: 'BPC-157/TB-500 Blend (daily). No CJC/Ipa or MOTS-C on Sundays.',
+    notes: [
+      'BPC-157/TB-500 Blend — every day including Sunday.',
+      'CJC/Ipa is weekdays only (Mon-Fri). Skip today.',
+      'MOTS-C is Mon/Wed/Fri only. Skip today.',
+      'Fasted injection. Rotate sites.',
+    ],
   },
   {
     time: '7:30 AM', cat: 'MEAL', action: 'Meal 1', detail: 'Eggs + oats or rice.',
-    notes: 'Moderate carbs this morning — Sunday is a light activity day. Eggs (3-4) + oats (50g dry) or small portion of rice. Set yourself up without going overboard before meal prep.',
+    notes: [
+      'Eggs 3-4 + oats 50g dry, or a small portion of rice.',
+      'Moderate carbs — Sunday is a lighter activity day.',
+      'Fuel yourself without overdoing it before meal prep.',
+    ],
   },
   {
     time: '9:00 AM', cat: 'CARDIO', action: 'Walk', detail: '30-40 min outdoor walk.',
-    notes: 'Outdoor only if possible. Morning sun, fresh air, and easy movement improve mood, circadian rhythm, and metabolic rate for the week. Keep HR below 120. This is mental reset as much as physical.',
+    notes: [
+      'Outdoor only if possible. Morning sun is a free performance tool.',
+      'Easy pace — HR under 120. Mental reset as much as physical.',
+      'Sets your circadian rhythm for the week ahead.',
+    ],
   },
   {
     time: '11:00 AM', cat: 'PREP', action: 'Meal Prep', detail: 'Cook protein, prep carbs, portion meals for the week.',
-    notes: 'This is the most important habit for hitting your macros. Batch cook: grill or bake 1.5-2kg chicken/turkey, cook 1-2kg white rice, portion into containers. 90 min of work Sunday = no decision fatigue Mon-Fri. No prep = no compliance.',
+    notes: [
+      'Batch cook 1.5-2kg chicken breast or turkey.',
+      'Cook 1-2kg white rice.',
+      'Wash and prep veggies.',
+      'Portion into containers for Mon-Fri.',
+      '90 min of work Sunday = no decision fatigue or macro misses all week.',
+      'No prep = no compliance. This is non-negotiable.',
+    ],
   },
   {
     time: '12:30 PM', cat: 'MEAL', action: 'Meal 2 — Lunch', detail: 'Protein + carbs + veggies.',
-    notes: 'First meal from your prep. Chicken + rice + whatever veggies you prepped. Keep it straightforward. Sunday is not a cheat day — stay on protocol.',
+    notes: [
+      'First meal straight from your prep.',
+      'Chicken or turkey + rice + veggies.',
+      'Sunday is not a cheat day. Stay on protocol.',
+    ],
   },
   {
     time: '3:00 PM', cat: 'MEAL', action: 'Meal 3', detail: 'Protein + moderate carbs.',
-    notes: 'Protein stays constant. Moderate carbs — Sunday is a lower-demand day. Turkey, fish, or chicken + a small serving of carbs. Veggies for the rest of the volume.',
+    notes: [
+      'Protein constant — same as every day.',
+      'Moderate carbs: small rice portion, sweet potato, or fruit.',
+      'Veggies for volume and fiber.',
+    ],
   },
   {
-    time: '5:00 PM', cat: 'INJECTION', action: 'Retatrutide Injection', detail: 'Retatrutide dose (Sunday evening). Rotate injection site.',
-    notes: 'Weekly Retatrutide injection, always Sunday evening. Rotate between belly, thigh, and glute to prevent site irritation. Reta causes mild GI effects (nausea, reduced appetite) for 12-24 hrs for most people — do this Sunday so the peak side effect window falls Sunday night, not a workday.',
-  },
-  {
-    time: '5:00 PM', cat: 'INJECTION', action: 'TB-500', detail: 'TB-500 (Sun + Thu). 5mg wk1-4, 2.5mg wk5-12.',
-    notes: 'Loading phase: 5mg per dose weeks 1-4. Maintenance: 2.5mg per dose weeks 5-12. Can combine in the same syringe as Retatrutide if volumes allow. TB-500 promotes systemic healing — tendons, ligaments, muscle. The Sunday + Thursday split keeps tissue levels consistent.',
+    time: '5:00 PM', cat: 'INJECTION', action: 'Retatrutide Injection', detail: 'Weekly Retatrutide dose. Rotate injection site.',
+    notes: [
+      'Weekly injection, always Sunday evening.',
+      'Rotate between belly, thigh, and glute to prevent site irritation.',
+      'Reta causes mild GI effects (nausea, reduced appetite) for 12-24 hrs.',
+      'Timing it Sunday puts the peak side effect window on Sunday night — not a workday.',
+      'BPC-157/TB-500 Blend covers connective tissue repair and is in your AM injection.',
+    ],
   },
   {
     time: '7:00 PM', cat: 'MEAL', action: 'Meal 4 — Dinner', detail: 'Light. Avoid high-fat post-Reta.',
-    notes: 'Post-Retatrutide, keep dinner light and low-fat. Reta slows gastric emptying — adding a high-fat meal on top increases nausea risk. Lean protein and veggies. Skip the olive oil drizzle tonight.',
+    notes: [
+      'Keep it lean and light post-Retatrutide.',
+      'Reta slows gastric emptying — high-fat meals on top increase nausea risk.',
+      'Lean protein (chicken, fish) + veggies.',
+      'Skip olive oil drizzle and any added fats tonight.',
+    ],
   },
   {
     time: '8:00 PM', cat: 'CHECKIN', action: 'Weekly Check-In', detail: 'Submit weight avg, photos, adherence, measurements.',
-    notes: 'Complete your weekly check-in in the app: 7-day weight average, weekly adherence score, and any notes for Coach V. Photos every 2 weeks (same lighting, same poses). Measurements (waist, chest, arms) monthly. This data is how we adjust the program.',
+    notes: [
+      '7-day weight average — log in the app.',
+      'Adherence score for the week (honest estimate %).',
+      'Notes for Coach V: energy, digestion, sleep quality, any issues.',
+      'Photos every 2 weeks — same lighting, same poses, same time of day.',
+      'Measurements (waist, chest, arms) monthly.',
+      'This data is how the program gets adjusted. Don\'t skip it.',
+    ],
   },
   {
     time: '8:30 PM', cat: 'MEAL', action: 'Meal 5 — Pre-Bed', detail: 'Casein. Keep it light (Reta GI).',
-    notes: 'Casein only tonight — no solid food if Reta GI is still active. 1 scoop casein in water. If you feel totally fine, cottage cheese is okay. Keep it small.',
+    notes: [
+      'Casein protein 1 scoop in water.',
+      'If Reta GI is still active, keep it liquid only.',
+      'If feeling totally fine, 1 cup cottage cheese is okay.',
+      'Keep it small tonight.',
+    ],
   },
   {
-    time: '9:00 PM', cat: 'INJECTION', action: 'PM Peptides', detail: 'Tesamorelin + CJC/Ipa + BPC-157.',
-    notes: '2+ hours fasted. Same PM protocol as every night: Tesamorelin first, wait 5-10 min, then CJC/Ipa + BPC together. Tesa and Reta work synergistically on fat loss through different mechanisms — this combination is intentional.',
+    time: '9:00 PM', cat: 'INJECTION', action: 'PM Peptides', detail: 'Tesamorelin 2mg + BPC-157/TB-500 Blend. (No CJC/Ipa Sundays.)',
+    notes: [
+      '2+ hours fasted.',
+      'Tesamorelin first — reconstitute gently, no shaking.',
+      'Wait 5-10 min, then BPC-157/TB-500 Blend.',
+      'No CJC/Ipa on Sundays.',
+      'Tesa + Reta work synergistically on fat loss through different mechanisms. Intentional combination.',
+    ],
   },
   {
     time: '9:45 PM', cat: 'SLEEP', action: 'Lights Out', detail: 'Early bed. Big week ahead.',
-    notes: 'Earlier bedtime tonight if possible. Sleep debt going into Monday degrades performance all week. Your GH pulse, cortisol rhythm, and training readiness all depend on getting ahead of the week, not behind it.',
+    notes: [
+      'Earlier bedtime tonight if possible.',
+      'Sleep debt going into Monday cascades all week — energy, training performance, recovery, and hunger regulation all suffer.',
+      '7.5 hours minimum. 8.5 is better.',
+    ],
   },
 ];
 
@@ -476,7 +699,7 @@ export function getPeptideList(dateStr: string): Array<{ key: string; label: str
   if (dow !== 0 && dow !== 6) {
     list.push({ key: 'am_cjc_ipa', label: 'AM — CJC-1295 + Ipamorelin (100/100mcg)' });
   }
-  list.push({ key: 'am_bpc', label: 'AM — BPC-157 (250mcg)' });
+  list.push({ key: 'am_bpc', label: 'AM — BPC-157/TB-500 Blend' });
   if ([1, 3, 5].includes(dow)) {
     list.push({ key: 'am_motsc', label: 'AM — MOTS-C (~1.7mg | 5mg/wk total)' });
   }
@@ -484,9 +707,8 @@ export function getPeptideList(dateStr: string): Array<{ key: string; label: str
   if (dow !== 0 && dow !== 6) {
     list.push({ key: 'pm_cjc_ipa', label: 'PM — CJC-1295 + Ipamorelin (100/100mcg)' });
   }
-  list.push({ key: 'pm_bpc', label: 'PM — BPC-157 (250mcg)' });
+  list.push({ key: 'pm_bpc', label: 'PM — BPC-157/TB-500 Blend' });
   if (dow === 0) list.push({ key: 'reta', label: 'Retatrutide (weekly dose)' });
-  if (dow === 0 || dow === 4) list.push({ key: 'tb500', label: 'TB-500' });
   return list;
 }
 
