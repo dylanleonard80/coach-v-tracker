@@ -360,6 +360,130 @@ export function getScheduleForDay(type: DayType): ScheduleItem[] {
   return SCHEDULE_REST;
 }
 
+// ============================================================
+// SHOPPING LIST — Phase-aware weekly grocery list
+// ============================================================
+export interface ShoppingItem {
+  name: string;
+  qty: string;
+  cost: string;
+  notes: string;
+}
+
+export interface ShoppingCategory {
+  category: string;
+  items: ShoppingItem[];
+}
+
+const SHOPPING_PHASE1: ShoppingCategory[] = [
+  {
+    category: 'PROTEIN — MEAT & FISH',
+    items: [
+      { name: 'Chicken breast (boneless, skinless)', qty: '4 lbs', cost: '$16-22', notes: 'Lunch/dinner protein' },
+      { name: 'Egg whites (carton, liquid)', qty: '1 carton (32 oz)', cost: '$5-6', notes: 'Supplement whole eggs' },
+      { name: '96% lean ground beef', qty: '2 lbs', cost: '$14-16', notes: 'Two meals across the week' },
+      { name: '93% lean ground turkey', qty: '2 lbs', cost: '$10-12', notes: 'Wed + Sun dinners' },
+      { name: 'Tilapia fillets', qty: '1 lb (2 fillets)', cost: '$8-10', notes: 'Bake Sunday' },
+      { name: 'Cod fillets', qty: '1 lb (2 fillets)', cost: '$10-12', notes: 'Bake Wednesday' },
+      { name: 'Salmon fillet', qty: '8 oz (1 fillet)', cost: '$8-10', notes: 'Thursday dinner. Fresh.' },
+      { name: 'Shrimp (peeled, deveined)', qty: '8 oz', cost: '$6-8', notes: 'Wednesday dinner' },
+      { name: 'Flank steak', qty: '8 oz', cost: '$8-10', notes: 'Thursday lunch. Grill Wed night.' },
+      { name: 'Sirloin steak', qty: '8 oz', cost: '$8-10', notes: 'Saturday dinner. Cook fresh.' },
+      { name: 'Smoked salmon', qty: '6 oz', cost: '$8-10', notes: 'Sunday breakfast' },
+      { name: 'Whole eggs (large)', qty: '3 dozen (36)', cost: '$12-15', notes: 'Training day breakfast + weekends. Buy bulk.' },
+    ],
+  },
+  {
+    category: 'PROTEIN — DAIRY & SUPPLEMENTS',
+    items: [
+      { name: 'Whey isolate protein', qty: '1 tub (ongoing)', cost: '$50-60/mo', notes: 'Momentous or Transparent Labs' },
+      { name: 'Casein protein', qty: '1 tub (ongoing)', cost: '$40-50/mo', notes: 'Before-bed protein' },
+      { name: 'Low-fat cottage cheese (2%)', qty: '64 oz (2 large tubs)', cost: '$10-12', notes: '5 servings/week. Staple.' },
+      { name: 'Greek yogurt (0% fat, plain)', qty: '6 oz container', cost: '$2', notes: 'Friday Meal 5 only' },
+      { name: 'EAA powder (intra-workout)', qty: '1 tub (ongoing)', cost: '$35-40/mo', notes: 'Kion or Transparent Labs' },
+    ],
+  },
+  {
+    category: 'CARBS — GRAINS & STARCHES',
+    items: [
+      { name: 'White jasmine rice (dry)', qty: '3 lbs', cost: '$4-5', notes: 'Cook 8+ cups per batch' },
+      { name: 'Old-fashioned oats', qty: '1 canister', cost: '$4-5', notes: 'Post-workout shakes. Lasts 2+ wks.' },
+      { name: 'Sweet potatoes', qty: '3 lbs (4-5 medium)', cost: '$4-5', notes: 'Bake whole Sunday' },
+      { name: 'White potatoes', qty: '2 lbs (2-3 medium)', cost: '$3-4', notes: 'Bake alongside sweets' },
+      { name: 'Ezekiel bread (frozen)', qty: '1 loaf', cost: '$5-6', notes: 'Sat + Sun breakfasts' },
+      { name: 'Rice cakes (plain)', qty: '1 pack', cost: '$3-4', notes: 'Wednesday post-workout' },
+      { name: 'Cyclic dextrin', qty: '1 bag (ongoing)', cost: '$30-35/mo', notes: 'Intra-workout carbs on leg days' },
+    ],
+  },
+  {
+    category: 'FRUITS',
+    items: [
+      { name: 'Bananas', qty: '5-6', cost: '$2-3', notes: 'Post-workout shakes + snacks' },
+      { name: 'Frozen blueberries', qty: '1 bag (16 oz)', cost: '$4-5', notes: 'Tuesday shake' },
+      { name: 'Frozen mango chunks', qty: '1 bag (16 oz)', cost: '$4-5', notes: 'Friday shake' },
+      { name: 'Apples (large)', qty: '1-2', cost: '$2', notes: 'Saturday Meal 3' },
+    ],
+  },
+  {
+    category: 'VEGETABLES',
+    items: [
+      { name: 'Broccoli (fresh or frozen)', qty: '2 lbs', cost: '$4-5', notes: 'Steam in bulk. Multiple meals.' },
+      { name: 'Green beans (fresh or frozen)', qty: '1 lb', cost: '$3-4', notes: 'Tues + Fri meals' },
+      { name: 'Asparagus', qty: '1 bunch', cost: '$4-5', notes: 'Tues + Sun meals' },
+      { name: 'Mixed greens (pre-washed)', qty: '2 bags (10 oz ea)', cost: '$6-8', notes: 'Salads for Meal 4' },
+      { name: 'Bell peppers (mixed)', qty: '3-4', cost: '$4-5', notes: 'Roast in bulk. Wed + Sun.' },
+      { name: 'Zucchini', qty: '2 medium', cost: '$2-3', notes: 'Friday dinner' },
+      { name: 'Spinach (fresh)', qty: '1 bag (10 oz)', cost: '$3-4', notes: 'Thursday dinner sauté' },
+      { name: 'Mixed frozen vegetables', qty: '1 bag (16 oz)', cost: '$3-4', notes: 'Saturday lunch' },
+    ],
+  },
+  {
+    category: 'FATS & OILS',
+    items: [
+      { name: 'Extra virgin olive oil', qty: '1 bottle (ongoing)', cost: '$8-10', notes: 'Cooking + dressings' },
+      { name: 'Coconut oil', qty: '1 jar (ongoing)', cost: '$6-8', notes: 'Lasts a month' },
+      { name: 'Natural almond butter', qty: '1 jar (16 oz)', cost: '$8-10', notes: 'Meal 5 staple. No sugar added.' },
+      { name: 'Natural peanut butter', qty: '1 jar (16 oz)', cost: '$5-7', notes: 'Alternate with almond butter' },
+      { name: 'Avocados', qty: '2', cost: '$3-4', notes: 'Tues + Sun. Buy firm.' },
+      { name: 'Butter (grass-fed)', qty: '1 stick', cost: '$3-4', notes: 'Minimal use. Tues + Thurs.' },
+      { name: 'Balsamic vinaigrette', qty: '1 bottle (ongoing)', cost: '$4-5', notes: 'Salad dressing' },
+    ],
+  },
+  {
+    category: 'CONDIMENTS & MISC',
+    items: [
+      { name: 'Honey', qty: '1 bottle (ongoing)', cost: '$5-6', notes: 'Tuesday shake' },
+      { name: 'Strawberry jam', qty: '1 jar (ongoing)', cost: '$4-5', notes: 'Wed post-workout rice cakes' },
+      { name: 'Salt, pepper, garlic powder, paprika', qty: 'Pantry staples', cost: '—', notes: 'Season everything' },
+      { name: 'Cooking spray (avocado oil)', qty: '1 can', cost: '$5-6', notes: 'Eggs + quick pan meals' },
+    ],
+  },
+  {
+    category: 'SUPPLEMENTS (Monthly Restock)',
+    items: [
+      { name: 'Creatine monohydrate (Creapure)', qty: '1 tub', cost: '$25-30/mo', notes: '5g daily' },
+      { name: 'LMNT electrolyte packets', qty: '1 box (30 ct)', cost: '$35-40/mo', notes: '2-3/day. Non-negotiable.' },
+      { name: 'Omega-3 fish oil (Nordic Naturals)', qty: '1 bottle', cost: '$25-30/mo', notes: '3g EPA/DHA daily' },
+      { name: 'Vitamin D3 + K2 (Thorne)', qty: '1 bottle', cost: '$15-20/mo', notes: '5,000 IU D3 + 200mcg K2' },
+      { name: 'Magnesium Glycinate (400mg)', qty: '1 bottle', cost: '$15-18/mo', notes: 'Before bed. Sleep quality.' },
+      { name: 'L-Theanine (200mg)', qty: '1 bottle', cost: '$12-15/mo', notes: 'Before bed. Stacks with Mag.' },
+      { name: 'Probiotic (Seed DS-01)', qty: '1 bottle', cost: '$50/mo', notes: 'Morning, empty stomach' },
+      { name: 'Digestive enzymes (NOW Super Enzymes)', qty: '1 bottle', cost: '$12-15/mo', notes: 'With Meals 3 & 4' },
+      { name: 'Psyllium husk', qty: '1 canister', cost: '$10-12/mo', notes: '1 tbsp before bed' },
+      { name: 'L-Citrulline (bulk)', qty: '1 bag', cost: '$20-25/mo', notes: '6-8g pre-workout' },
+      { name: 'Pre-workout (Gorilla Mode)', qty: '1 tub', cost: '$40-50/mo', notes: 'Or black coffee + citrulline' },
+    ],
+  },
+];
+
+export const SHOPPING_BY_PHASE: Record<number, ShoppingCategory[]> = {
+  1: SHOPPING_PHASE1,
+  2: SHOPPING_PHASE1, // Same base list — adjustments in Phase 2/3 TBD
+  3: SHOPPING_PHASE1,
+};
+
+export const WEEKLY_COST_ESTIMATE = { food: '$150-200', supplements: '$260-320/mo' };
+
 export const CAT_COLORS: Record<string, string> = {
   WAKE: '#a0aec0',
   INJECTION: '#e53e3e',

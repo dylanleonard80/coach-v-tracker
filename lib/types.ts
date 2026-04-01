@@ -55,4 +55,4 @@ export interface AppState {
   weeklyCheckins: Record<number, WeeklyCheckin>;
 }
 
-export type ActiveTab = 'daily' | 'checkin' | 'dashboard';
+export type ActiveTab = 'daily' | 'checkin' | 'dashboard' | 'shopping';

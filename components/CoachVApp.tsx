@@ -11,6 +11,7 @@ import { loadRemoteState, upsertDayLog, upsertCheckin } from '@/lib/supabase';
 import DailyView from './DailyView';
 import WeeklyCheckin from './WeeklyCheckin';
 import Dashboard from './Dashboard';
+import ShoppingList from './ShoppingList';
 
 const STORAGE_KEY = 'coachv_state';
 const SYNC_DEBOUNCE_MS = 1500;
@@ -201,6 +202,7 @@ export default function CoachVApp() {
         <button className={`nav-btn${tab === 'daily' ? ' active' : ''}`} onClick={() => setTab('daily')}>DAILY</button>
         <button className={`nav-btn${tab === 'checkin' ? ' active' : ''}`} onClick={() => setTab('checkin')}>CHECK-IN</button>
         <button className={`nav-btn${tab === 'dashboard' ? ' active' : ''}`} onClick={() => setTab('dashboard')}>DASHBOARD</button>
+        <button className={`nav-btn${tab === 'shopping' ? ' active' : ''}`} onClick={() => setTab('shopping')}>SHOP</button>
       </nav>
 
       {/* Day navigator */}
@@ -256,6 +258,9 @@ export default function CoachVApp() {
         )}
         {tab === 'dashboard' && (
           <Dashboard appState={appState} currentDate={currentDate} />
+        )}
+        {tab === 'shopping' && (
+          <ShoppingList phase={phase} />
         )}
       </main>
 
